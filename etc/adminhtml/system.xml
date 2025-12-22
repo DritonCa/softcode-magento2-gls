@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Config/etc/system_file.xsd">
+    <system>
+        <section id="shipping" translate="label" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Shipping Methods</label>
+            <tab>sales</tab>
+
+            <group id="gls" translate="label" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>GLS</label>
+
+                <field id="enabled" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable GLS</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+
+                <field id="business_enabled" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable GLS Ship to Business</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="business_price" type="text" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Price (Ship to Business)</label>
+                    <validate>validate-number</validate>
+                </field>
+
+                <field id="home_enabled" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable GLS Ship to Home</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="home_price" type="text" sortOrder="21" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Price (Ship to Home)</label>
+                    <validate>validate-number</validate>
+                </field>
+
+                <field id="shop_enabled" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable GLS Ship to Shop (Pakkeshop)</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="shop_price" type="text" sortOrder="31" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Price (Ship to Shop)</label>
+                    <validate>validate-number</validate>
+                </field>
+
+                <field id="username" type="text" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>User Name</label>
+                    <validate>required-entry</validate>
+                </field>
+                <field id="password" type="obscure" sortOrder="110" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Password</label>
+                    <validate>required-entry</validate>
+                </field>
+                <field id="customer_id" type="text" sortOrder="120" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Customer ID</label>
+                    <validate>required-entry</validate>
+                </field>
+                <field id="contact_id" type="text" sortOrder="130" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Contact ID (optional)</label>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

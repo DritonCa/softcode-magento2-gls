@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Config/etc/config.xsd">
+    <default>
+        <softcode>
+            <gls>
+                <enabled>0</enabled>
+                <username/>
+                <password/>
+                <customer_id/>
+                <contact_id/>
+            </gls>
+        </softcode>
+        <carriers>
+            <softcode_gls>
+                <active>1</active>
+                <title>GLS</title>
+                <name>GLS</name>
+                <model>Softcode\Gls\Model\Carrier\Gls</model>
+            </softcode_gls>
+        </carriers>
+    </default>
+</config>

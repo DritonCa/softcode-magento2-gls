@@ -1,0 +1,24 @@
+<?php
+/** @var \Magento\Framework\View\Element\Template $block */
+$config = $block->getLayout()
+    ->getBlock('softcode.gls.config')
+    ->getData('gls_config');
+
+/**
+ * Fallback-safe config load
+ */
+$configModel = \Magento\Framework\App\ObjectManager::getInstance()
+    ->get(\Softcode\Gls\Model\Config::class);
+?>
+
+<script>
+    window.softcode = window.softcode || {};
+
+    window.softcode.gls = {
+        enabled: <?= $configModel->isEnabled() ? 'true' : 'false' ?>
+    };
+
+    window.softcode.delivery = window.softcode.delivery || {
+        mountPoint: '#sc-delivery-methods'
+    };
+</script>

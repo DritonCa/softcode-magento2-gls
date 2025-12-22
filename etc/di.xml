@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <type name="Magento\Quote\Model\Quote\Address\Total\Collector">
+        <arguments>
+            <argument name="calculators" xsi:type="array">
+                <item name="gls_shipping"
+                      xsi:type="string">
+                    Softcode\Gls\Model\Quote\Address\Total\GlsShipping
+                </item>
+            </argument>
+        </arguments>
+    </type>
+
+</config>
