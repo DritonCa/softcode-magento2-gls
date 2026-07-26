@@ -2,11 +2,12 @@
 namespace Softcode\Gls\Controller\Index;
 
 use Magento\Framework\App\Action\Action;
+use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\HTTP\Client\Curl;
 
-class getGlsList extends Action
+class getGlsList extends Action implements HttpGetActionInterface
 {
     public function __construct(
     Context $context,

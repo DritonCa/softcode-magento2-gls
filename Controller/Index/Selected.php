@@ -2,11 +2,12 @@
 namespace Softcode\Gls\Controller\Index;
 
 use Magento\Framework\App\Action\Action;
+use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Checkout\Model\Session as CheckoutSession;
 
-class Selected extends Action
+class Selected extends Action implements HttpGetActionInterface
 {
     public function __construct(
         Context $context,

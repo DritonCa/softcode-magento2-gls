@@ -9,7 +9,11 @@
         <referenceContainer name="before.body.end">
             <block class="Magento\Framework\View\Element\Template"
                    name="softcode.gls.config"
-                   template="Softcode_Gls::config.phtml"/>
+                   template="Softcode_Gls::config.phtml">
+                <arguments>
+                    <argument name="view_model" xsi:type="object">Softcode\Gls\ViewModel\Config</argument>
+                </arguments>
+            </block>
         </referenceContainer>
     </body>
 </page>
