@@ -1,73 +1,80 @@
-# Softcode GLS Shipping for Magento 2
+# Softcode_Gls
 
-Free, lightweight Magento 2 module that adds **GLS shipping intelligence**
-to **any checkout** using **simple CSS selectors and JS hooks**.
-
-Built for **custom checkouts**, **B2B flows**, and **real-world logistics**.
-
----
-
-## ✨ Features
-
-- 🚚 **GLS Home, Business & ParcelShop delivery**
-- 🏪 **ParcelShop selector support**
-- 🎯 **Selector-based integration**
-- 🔁 **Live saving of GLS data to quote**
-- 💰 **Custom GLS shipping price calculation**
-- 🔐 **Server-side validation**
-- 🧠 **Quote → Order GLS data mapping**
-- 🆓 **100% free & open source**
+A Magento 2 module that adds **GLS shipping** to the checkout: GLS Home, Business
+and ParcelShop delivery, a parcel-shop selector, and its own shipping-price rule.
+It attaches to any checkout — Luma, a custom one-page, or headless — through small
+JS hooks, and it persists the chosen GLS option all the way from quote to order.
 
 ---
 
-## 🧱 Supported setups
+## Requirements
 
-✔ Luma checkout  
-✔ Custom checkouts  
-✔ Headless storefronts
+- Magento **2.4.x**
+- PHP **8.1** or **8.2**
 
-✔ B2C & B2B shops  
-✔ Public sector orders (EAN)
+## Installation
 
-> This module does **not** depend on Magento Checkout JS internals.
+**With Composer (recommended)**
 
----
+```bash
+composer require softcode/module-gls
+bin/magento setup:upgrade
+bin/magento setup:di:compile
+bin/magento cache:flush
+```
 
-## 🧪 Tested with
+**Manually**
 
-This module has been **developed and tested in production**
-together with the following setup:
+Copy the module to `app/code/Softcode/Gls`, then run the same three commands.
 
-- Custom checkout built on top of `Softcode_CheckoutOverride`
-- B2B / B2C hybrid flows
-- GLS Home, Business & ParcelShop delivery
-- Real ParcelShop selection and validation
-- Real order placement with GLS data persisted on the order
+## Configuration
 
-This ensures the module is **not theoretical**, but built and verified
-in a **real checkout flow**.
-
----
-
-## 🧠 How it works
-
-1. Customer selects a GLS delivery method
-2. If `gls_shop` is selected:
-    - A ParcelShop must be chosen
-3. Selection is saved on the **quote**
-4. Validation happens **server-side**
-5. GLS data is copied to the **order**
-
-Invalid GLS selections **cannot be ordered**.
+Enable the module and its carrier under
+**Stores → Configuration → Sales → Shipping Methods → Softcode GLS**.
+The carrier code is `softcode_gls`; access is guarded by the module's ACL.
 
 ---
 
-## 🎯 Required selectors
+## How it works
 
-The module integrates using **plain CSS selectors**.
+- **Carrier** (`Model/Carrier/Gls`) registers GLS as a shipping method so it shows
+  up in the quote's shipping rates.
+- **Price rule** (`Model/Quote/Address/Total/GlsShipping`) sets the GLS shipping
+  amount as a quote total, so the price is calculated server-side, not in the UI.
+- **Frontend** (`gls-checkout.js`) reads the customer's choice and talks to the
+  module's controllers to look up parcel shops and save the selection to the quote.
 
-### Delivery method selector
-```html
-<input type="radio" name="delivery_method" value="gls_home">
-<input type="radio" name="delivery_method" value="gls_business">
-<input type="radio" name="delivery_method" value="gls_shop">
+```
+Checkout (gls-checkout.js)
+   │  AJAX
+   ▼
+GLS controllers ──▶ Quote (GLS method + shop) ──▶ GlsShipping total ──▶ Order
+```
+
+### Endpoints
+
+| Method | Route | Purpose |
+| --- | --- | --- |
+| `GET`  | `/gls/index/methods` | Available GLS delivery methods |
+| `GET`  | `/gls/index/getglslist` | Nearby parcel shops for a postcode |
+| `GET`  | `/gls/index/selected` | The currently selected GLS option |
+| `POST` | `/gls/index/save` | Save the chosen method / parcel shop to the quote |
+
+Each controller declares its HTTP verb via `HttpGetActionInterface` /
+`HttpPostActionInterface`, per Magento conventions.
+
+---
+
+## Notes for integrators
+
+- The parcel-shop list is looked up live; point it at your GLS data source in
+  `Controller/Index/getGlsList`.
+- As with any custom AJAX checkout, send Magento's `form_key` with the `save` POST
+  and validate it (`CsrfAwareActionInterface` + `FormKey\Validator`) before going
+  to production.
+
+---
+
+## License
+
+MIT — see [LICENSE](LICENSE).
