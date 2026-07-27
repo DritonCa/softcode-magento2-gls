@@ -181,6 +181,7 @@ require(['jquery'], function ($) {
             isSaving = true;
 
             $.post('/gls/index/save', {
+                form_key: $('input[name="form_key"]').val() || (window.FORM_KEY || ''),
                 method: method,
                 shop_id: method === 'gls_shop' ? shopId : ''
             })

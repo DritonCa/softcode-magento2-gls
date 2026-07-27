@@ -104,5 +104,29 @@ class Config
         return (string)$this->scopeConfig->getValue(self::XML_PATH_BASE.$key, ScopeInterface::SCOPE_WEBSITE);
     }
 
+    /**
+     * @return string[] enabled GLS method codes
+     */
+    public function getMethodCodes(): array
+    {
+        return array_column($this->getDeliveryMethods(), 'code');
+    }
 
+    public function isAllowedMethod(string $code): bool
+    {
+        return in_array($code, $this->getMethodCodes(), true);
+    }
+
+    /**
+     * Configured price for an enabled method, or null if the method is not allowed.
+     */
+    public function getMethodPrice(string $code): ?float
+    {
+        foreach ($this->getDeliveryMethods() as $method) {
+            if ($method['code'] === $code) {
+                return (float) $method['price'];
+            }
+        }
+        return null;
+    }
 }

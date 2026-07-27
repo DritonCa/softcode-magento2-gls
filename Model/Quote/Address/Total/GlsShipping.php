@@ -32,19 +32,14 @@ class GlsShipping extends AbstractTotal
             return $this;
         }
 
-        $price = 0.0;
-        foreach ($this->config->getDeliveryMethods() as $configMethod) {
-            if ($configMethod['code'] === $method) {
-                $price = (float)$configMethod['price'];
-                break;
-            }
-        }
-
-        if ($price <= 0) {
+        // Look the price up centrally; null means the method is not an enabled,
+        // configured method — never fall through to free shipping in that case.
+        $price = $this->config->getMethodPrice($method);
+        if ($price === null) {
             return $this;
         }
 
-        // ✅ Correct: only override shipping amounts
+        // Only override the shipping amounts (a configured price of 0 is a valid free method).
         $total->setShippingAmount($price);
         $total->setBaseShippingAmount($price);
 
