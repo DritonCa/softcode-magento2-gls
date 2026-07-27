@@ -44,11 +44,12 @@ The carrier code is `softcode_gls`; access is guarded by the module's ACL.
 - **Frontend** (`gls-checkout.js`) reads the customer's choice and talks to the
   module's controllers to look up parcel shops and save the selection to the quote.
 
-```
-Checkout (gls-checkout.js)
-   │  AJAX
-   ▼
-GLS controllers ──▶ Quote (GLS method + shop) ──▶ GlsShipping total ──▶ Order
+```mermaid
+flowchart LR
+    JS["Checkout<br/>(gls-checkout.js)"] -->|AJAX| C["GLS controllers"]
+    C --> Q["Quote<br/>(GLS method + shop)"]
+    Q --> T["GlsShipping total<br/>(server-side price)"]
+    T --> O["Order"]
 ```
 
 ### Endpoints
