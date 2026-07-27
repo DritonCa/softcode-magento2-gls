@@ -1,5 +1,16 @@
 # Changelog
 
+## [Unreleased]
+### Added
+- `Test/Unit/Model/ConfigTest.php` — a unit test that specifies the GLS
+  delivery-method rules (carrier on/off, only-enabled methods, stable ordering,
+  and `getMethodPrice()` returning `0.0` for free vs `null` for a disallowed
+  method).
+### Changed
+- CI now **fails** on Magento 2 coding-standard errors: removed the `|| true`
+  that silently swallowed `phpcs` failures and added `-n` so only errors (not
+  warnings) break the build.
+
 ## [1.1.0]
 ### Fixed
 - Validate the GLS method server-side against the enabled configured methods, so
