@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 ### Added
+- **Unit tests now run in CI** as a real gate — a standalone `Test/bootstrap.php`
+  autoloads the module and stubs the mocked Magento contracts, so
+  `phpunit -c phpunit.xml.dist` runs without a Magento install.
 - `Test/Unit/Model/ConfigTest.php` — a unit test that specifies the GLS
   delivery-method rules (carrier on/off, only-enabled methods, stable ordering,
   and `getMethodPrice()` returning `0.0` for free vs `null` for a disallowed

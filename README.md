@@ -79,12 +79,12 @@ Each controller declares its HTTP verb via `HttpGetActionInterface` /
 ## Testing
 
 `Model\Config` is the single source of truth for which GLS methods are offered and
-at what price, so it has a unit test that doubles as an executable specification:
+at what price, so it has a unit test that doubles as an executable specification.
+It is pure logic and **runs without a Magento install** — `Test/bootstrap.php`
+autoloads the module and stubs the couple of Magento contracts it mocks:
 
 ```bash
-# from a Magento install with the module in app/code/Softcode/Gls
-vendor/bin/phpunit -c dev/tests/unit/phpunit.xml.dist \
-  app/code/Softcode/Gls/Test/Unit
+phpunit -c phpunit.xml.dist
 ```
 
 `ConfigTest` covers the carrier being disabled, only enabled methods being offered,
@@ -99,9 +99,7 @@ The GitHub Actions workflow runs on every push/PR and **fails the build** on:
 
 - PHP syntax errors (`php -l` on every file)
 - Magento 2 coding-standard **errors** (`phpcs --standard=Magento2 -n`)
-
-It does **not** run the unit tests (those need a Magento framework install); run
-them locally as shown above.
+- **Unit-test failures** (`phpunit -c phpunit.xml.dist`, run as a real gate)
 
 ---
 
