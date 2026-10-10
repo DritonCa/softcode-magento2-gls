@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!-- Copies the customer's GLS choice from the quote to the order when it is placed. -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:DataObject/etc/fieldset.xsd">
+    <scope id="global">
+        <fieldset id="sales_convert_quote">
+            <field name="gls_method"><aspect name="to_order"/></field>
+            <field name="gls_shop_id"><aspect name="to_order"/></field>
+            <field name="gls_shop_name"><aspect name="to_order"/></field>
+            <field name="gls_shop_address"><aspect name="to_order"/></field>
+            <field name="gls_shop_postcode"><aspect name="to_order"/></field>
+            <field name="gls_shop_city"><aspect name="to_order"/></field>
+        </fieldset>
+    </scope>
+</config>

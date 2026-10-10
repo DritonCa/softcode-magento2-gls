@@ -1,0 +1,27 @@
+{
+    "quote": {
+        "column": {
+            "gls_method": true,
+            "gls_shop_id": true,
+            "gls_shop_name": true,
+            "gls_shop_address": true,
+            "gls_shop_postcode": true,
+            "gls_shop_city": true
+        }
+    },
+    "sales_order": {
+        "column": {
+            "gls_method": true,
+            "gls_shop_id": true,
+            "gls_shop_name": true,
+            "gls_shop_address": true,
+            "gls_shop_postcode": true,
+            "gls_shop_city": true,
+            "gls_label_pdf": true,
+            "gls_label_count": true,
+            "gls_label_merged": true,
+            "gls_tracking_number": true,
+            "gls_tracking_url": true
+        }
+    }
+}

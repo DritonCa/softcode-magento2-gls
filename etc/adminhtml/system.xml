@@ -2,59 +2,79 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework:Config/etc/system_file.xsd">
     <system>
-        <section id="shipping" translate="label" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
-            <label>Shipping Methods</label>
-            <tab>sales</tab>
-
-            <group id="gls" translate="label" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+        <section id="shipping">
+            <group id="gls" translate="label" sortOrder="10" showInDefault="1" showInWebsite="1">
                 <label>GLS</label>
 
-                <field id="enabled" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1">
                     <label>Enable GLS</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
 
-                <field id="business_enabled" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Enable GLS Ship to Business</label>
+                <field id="business_enabled" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1">
+                    <label>Ship to Business</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="business_price" type="text" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="business_price" translate="label" type="text" sortOrder="11" showInDefault="1" showInWebsite="1">
                     <label>Price (Ship to Business)</label>
-                    <validate>validate-number</validate>
+                    <validate>validate-number validate-zero-or-greater</validate>
+                    <depends><field id="business_enabled">1</field></depends>
                 </field>
-
-                <field id="home_enabled" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Enable GLS Ship to Home</label>
+                <field id="home_enabled" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1">
+                    <label>Ship to Home</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="home_price" type="text" sortOrder="21" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="home_price" translate="label" type="text" sortOrder="21" showInDefault="1" showInWebsite="1">
                     <label>Price (Ship to Home)</label>
-                    <validate>validate-number</validate>
+                    <validate>validate-number validate-zero-or-greater</validate>
+                    <depends><field id="home_enabled">1</field></depends>
                 </field>
-
-                <field id="shop_enabled" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Enable GLS Ship to Shop (Pakkeshop)</label>
+                <field id="shop_enabled" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1">
+                    <label>Ship to Parcel Shop</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="shop_price" type="text" sortOrder="31" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Price (Ship to Shop)</label>
-                    <validate>validate-number</validate>
+                <field id="shop_price" translate="label" type="text" sortOrder="31" showInDefault="1" showInWebsite="1">
+                    <label>Price (Ship to Parcel Shop)</label>
+                    <validate>validate-number validate-zero-or-greater</validate>
+                    <depends><field id="shop_enabled">1</field></depends>
                 </field>
 
-                <field id="username" type="text" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>User Name</label>
-                    <validate>required-entry</validate>
+                <field id="excluded_skus" translate="label comment" type="textarea" sortOrder="40" showInDefault="1" showInWebsite="1">
+                    <label>Non-shippable SKUs</label>
+                    <comment>SKUs that are never shipped (digital products, services ...), separated by commas or new lines. Virtual and downloadable products are excluded automatically.</comment>
                 </field>
-                <field id="password" type="obscure" sortOrder="110" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Password</label>
-                    <validate>required-entry</validate>
+
+                <field id="username" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="1">
+                    <label>API User Name</label>
                 </field>
-                <field id="customer_id" type="text" sortOrder="120" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="password" translate="label" type="obscure" sortOrder="110" showInDefault="1" showInWebsite="1">
+                    <label>API Password</label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                </field>
+                <field id="customer_id" translate="label" type="text" sortOrder="120" showInDefault="1" showInWebsite="1">
                     <label>Customer ID</label>
-                    <validate>required-entry</validate>
                 </field>
-                <field id="contact_id" type="text" sortOrder="130" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="contact_id" translate="label" type="text" sortOrder="130" showInDefault="1" showInWebsite="1">
                     <label>Contact ID (optional)</label>
+                </field>
+                <field id="label_api_url" translate="label comment" type="text" sortOrder="140" showInDefault="1">
+                    <label>Label API URL</label>
+                    <comment>GLS CreateShipment endpoint. Leave empty for https://api.gls.dk/ws/DK/V1/CreateShipment.</comment>
+                </field>
+
+                <field id="max_parcel_weight" translate="label comment" type="text" sortOrder="200" showInDefault="1" showInWebsite="1">
+                    <label>Max Weight per Parcel (kg)</label>
+                    <comment>Heavier orders are split into one label per parcel, e.g. 20 kg with a 15 kg limit gives 2 labels. 0 disables splitting.</comment>
+                    <validate>validate-number validate-zero-or-greater</validate>
+                </field>
+                <field id="ship_on_invoice" translate="label comment" type="select" sortOrder="210" showInDefault="1" showInWebsite="1">
+                    <label>Ship When Invoiced</label>
+                    <comment>When an order with a GLS label is invoiced, create the shipment with tracking and send the shipment email.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="tracking_url" translate="label comment" type="text" sortOrder="220" showInDefault="1" showInWebsite="1">
+                    <label>Tracking URL</label>
+                    <comment>{number} is replaced by the consignment id. Leave empty for the Danish GLS tracking page.</comment>
                 </field>
             </group>
         </section>

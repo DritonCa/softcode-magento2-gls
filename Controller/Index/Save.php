@@ -25,6 +25,14 @@ use Softcode\Gls\Model\Config;
  */
 class Save implements HttpPostActionInterface, CsrfAwareActionInterface
 {
+    /** request param => [quote column, max length] */
+    private const SHOP_FIELDS = [
+        'shop_name' => ['gls_shop_name', 255],
+        'shop_street' => ['gls_shop_address', 255],
+        'shop_postcode' => ['gls_shop_postcode', 16],
+        'shop_city' => ['gls_shop_city', 128],
+    ];
+
     public function __construct(
         private readonly JsonFactory $resultJsonFactory,
         private readonly CheckoutSession $checkoutSession,
@@ -66,8 +74,14 @@ class Save implements HttpPostActionInterface, CsrfAwareActionInterface
                 throw new LocalizedException(__('There is no active cart.'));
             }
 
+            $isShop = $method === 'gls_shop';
             $quote->setData('gls_method', $method);
-            $quote->setData('gls_shop_id', $method === 'gls_shop' ? $shopId : null);
+            // The shop details are display data for the order view and emails; the id is what GLS uses.
+            foreach (self::SHOP_FIELDS as $param => [$column, $maxLength]) {
+                $value = $isShop ? mb_substr(trim((string)$this->request->getParam($param, '')), 0, $maxLength) : '';
+                $quote->setData($column, $value !== '' ? $value : null);
+            }
+            $quote->setData('gls_shop_id', $isShop ? mb_substr($shopId, 0, 64) : null);
 
             // Collect rates first so the shipping method exists, then select it.
             $shippingAddress = $quote->getShippingAddress();

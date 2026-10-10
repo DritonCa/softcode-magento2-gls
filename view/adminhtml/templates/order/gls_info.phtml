@@ -1,0 +1,80 @@
+<?php
+/** @var \Softcode\Gls\Block\Adminhtml\Order\View\GlsInfo $block */
+/** @var \Magento\Framework\Escaper $escaper */
+/** @var \Magento\Framework\View\Helper\SecureHtmlRenderer $secureRenderer */
+if ($block->getField('gls_method') === '' && !$block->hasLabel()) {
+    return;
+}
+$tracking = $block->getField('gls_tracking_number');
+?>
+<div class="admin__page-section">
+    <div class="admin__page-section-title">
+        <span class="title"><?= $escaper->escapeHtml(__('GLS Delivery')) ?></span>
+    </div>
+    <div class="admin__page-section-content">
+        <table class="admin__table-secondary">
+            <?php if ($block->getField('gls_method') !== ''): ?>
+                <tr>
+                    <th><?= $escaper->escapeHtml(__('Method')) ?></th>
+                    <td><?= $escaper->escapeHtml($block->getMethodLabel()) ?></td>
+                </tr>
+            <?php endif; ?>
+            <?php if ($block->getField('gls_method') === 'gls_shop'): ?>
+                <tr>
+                    <th><?= $escaper->escapeHtml(__('Parcel shop')) ?></th>
+                    <td>
+                        <?= $escaper->escapeHtml($block->getField('gls_shop_name')) ?>
+                        (<?= $escaper->escapeHtml($block->getField('gls_shop_id')) ?>)<br>
+                        <?= $escaper->escapeHtml($block->getField('gls_shop_address')) ?><br>
+                        <?= $escaper->escapeHtml($block->getField('gls_shop_postcode')) ?>
+                        <?= $escaper->escapeHtml($block->getField('gls_shop_city')) ?>
+                    </td>
+                </tr>
+            <?php endif; ?>
+            <?php if ($tracking !== ''): ?>
+                <tr>
+                    <th><?= $escaper->escapeHtml(__('Tracking')) ?></th>
+                    <td>
+                        <?= $escaper->escapeHtml($tracking) ?><br>
+                        <a href="<?= $escaper->escapeUrl($block->getField('gls_tracking_url')) ?>"
+                           target="_blank" rel="noopener noreferrer"><?= $escaper->escapeHtml(__('Track parcel at GLS')) ?></a>
+                    </td>
+                </tr>
+            <?php endif; ?>
+            <?php if ($block->hasLabel() && $block->getLabelCount() > 1): ?>
+                <tr>
+                    <th><?= $escaper->escapeHtml(__('Labels')) ?></th>
+                    <td>
+                        <?= $escaper->escapeHtml(__('Split into %1 parcels (weight limit).', $block->getLabelCount())) ?><br>
+                        <a href="<?= $escaper->escapeUrl($block->getDownloadUrl()) ?>">
+                            <?= $escaper->escapeHtml($block->isLabelMerged() ? __('Download all (PDF)') : __('Download all (ZIP)')) ?>
+                        </a><br>
+                        <?php for ($i = 1; $i <= $block->getLabelCount(); $i++): ?>
+                            <a href="<?= $escaper->escapeUrl($block->getDownloadUrl($i)) ?>"><?= $escaper->escapeHtml(__('Label %1', $i)) ?></a>
+                        <?php endfor; ?>
+                    </td>
+                </tr>
+            <?php elseif (!$block->hasLabel()): ?>
+                <tr>
+                    <td colspan="2"><em><?= $escaper->escapeHtml(__('No GLS label created yet.')) ?></em></td>
+                </tr>
+            <?php endif; ?>
+        </table>
+
+        <?php if ($block->shouldDownloadNow()): ?>
+            <?php $url = $block->getDownloadUrl(); ?>
+            <p class="message message-notice">
+                <?= $escaper->escapeHtml(__('The label is downloading.')) ?>
+                <a href="<?= $escaper->escapeUrl($url) ?>"><?= $escaper->escapeHtml(__('Click here if nothing happens.')) ?></a>
+            </p>
+            <?php
+            // Remove the flag from the address first so a reload does not download again.
+            // Rendered through $secureRenderer so it carries the admin CSP nonce.
+            $js = '(function(){try{var u=new URL(window.location.href);u.searchParams.delete("gls_download");'
+                . 'window.history.replaceState({},"",u.toString());}catch(e){}'
+                . 'window.location.assign(' . json_encode($url, JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) . ');}());';
+            ?>
+            <?= /* @noEscape */ $secureRenderer->renderTag('script', [], $js, false) ?>
+        <?php endif; ?>
+    </div>
+</div>

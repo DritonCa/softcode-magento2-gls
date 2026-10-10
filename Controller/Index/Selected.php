@@ -1,30 +1,36 @@
 <?php
+declare(strict_types=1);
+
 namespace Softcode\Gls\Controller\Index;
 
-use Magento\Framework\App\Action\Action;
-use Magento\Framework\App\Action\HttpGetActionInterface;
-use Magento\Framework\App\Action\Context;
-use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Checkout\Model\Session as CheckoutSession;
+use Magento\Framework\App\Action\HttpGetActionInterface;
+use Magento\Framework\Controller\Result\JsonFactory;
+use Magento\Framework\Controller\ResultInterface;
 
-class Selected extends Action implements HttpGetActionInterface
+/**
+ * Returns the GLS choice stored on the current quote, so the checkout can restore it.
+ */
+class Selected implements HttpGetActionInterface
 {
     public function __construct(
-        Context $context,
-        private JsonFactory $jsonFactory,
-        private CheckoutSession $checkoutSession
+        private readonly JsonFactory $jsonFactory,
+        private readonly CheckoutSession $checkoutSession
     ) {
-        parent::__construct($context);
     }
 
-    public function execute()
+    public function execute(): ResultInterface
     {
         $quote = $this->checkoutSession->getQuote();
 
         return $this->jsonFactory->create()->setData([
             'success' => true,
-            'method'  => $quote->getData('gls_method'),
-            'shop_id' => $quote->getData('gls_shop_id')
+            'method' => $quote->getData('gls_method'),
+            'shop_id' => $quote->getData('gls_shop_id'),
+            'shop_name' => $quote->getData('gls_shop_name'),
+            'shop_street' => $quote->getData('gls_shop_address'),
+            'shop_postcode' => $quote->getData('gls_shop_postcode'),
+            'shop_city' => $quote->getData('gls_shop_city'),
         ]);
     }
 }

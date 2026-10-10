@@ -3,11 +3,10 @@
 /**
  * Standalone unit-test bootstrap.
  *
- * The unit tests only depend on a couple of Magento contracts, which they mock.
- * This bootstrap autoloads the module's own classes and defines minimal stand-ins
- * for those contracts *only when the real framework is absent*, so the tests run in
- * plain CI (no Magento install). Inside a real Magento install the genuine classes
- * exist and win.
+ * The unit tests only touch a few Magento contracts, which they mock. This bootstrap
+ * autoloads the module's own classes and defines minimal stand-ins for those
+ * contracts *only when the real framework is absent*, so the tests run in plain CI
+ * (no Magento install). Inside a real Magento install the genuine classes win.
  */
 
 namespace {
@@ -21,6 +20,16 @@ namespace {
             require $path;
         }
     });
+
+    if (!function_exists('__')) {
+        function __($text, ...$args)
+        {
+            foreach ($args as $i => $arg) {
+                $text = str_replace('%' . ($i + 1), (string)$arg, $text);
+            }
+            return $text;
+        }
+    }
 }
 
 namespace Magento\Framework\App\Config {
@@ -42,6 +51,27 @@ namespace Magento\Store\Model {
             public const SCOPE_WEBSITES = 'websites';
             public const SCOPE_STORE = 'store';
             public const SCOPE_STORES = 'stores';
+        }
+    }
+}
+
+namespace Magento\Framework\Encryption {
+    if (!interface_exists(EncryptorInterface::class)) {
+        interface EncryptorInterface
+        {
+            public function decrypt($data);
+        }
+    }
+}
+
+namespace Magento\Framework\Exception {
+    if (!class_exists(LocalizedException::class)) {
+        class LocalizedException extends \Exception
+        {
+            public function __construct($phrase, ?\Exception $cause = null, $code = 0)
+            {
+                parent::__construct((string)$phrase, (int)$code, $cause);
+            }
         }
     }
 }

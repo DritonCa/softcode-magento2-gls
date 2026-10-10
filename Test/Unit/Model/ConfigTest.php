@@ -120,4 +120,42 @@ class ConfigTest extends TestCase
         $this->assertFalse($config->isAllowedMethod(''));
         $this->assertFalse($config->isAllowedMethod('flatrate'));
     }
+
+    public function testExcludedSkusAcceptCommasAndNewLines(): void
+    {
+        $config = $this->config(['shipping/gls/excluded_skus' => " A-1, B-2\nC-3\r\n\n"]);
+
+        $this->assertSame(['A-1', 'B-2', 'C-3'], $config->getExcludedSkus());
+        $this->assertSame([], $this->config([])->getExcludedSkus());
+    }
+
+    public function testTrackingUrlUsesTemplateOrDanishDefault(): void
+    {
+        $this->assertSame(
+            'https://gls-group.eu/DK/da/find-pakke?match=0001%202',
+            $this->config([])->getTrackingUrl('0001 2')
+        );
+        $this->assertSame(
+            'https://example.test/track/42',
+            $this->config(['shipping/gls/tracking_url' => 'https://example.test/track/{number}'])->getTrackingUrl('42')
+        );
+    }
+
+    public function testLabelApiUrlDefaultsToGlsDenmark(): void
+    {
+        $this->assertSame(Config::DEFAULT_LABEL_API_URL, $this->config([])->getLabelApiUrl());
+    }
+
+    public function testPasswordIsDecryptedWithPlainTextFallback(): void
+    {
+        $scope = $this->createMock(ScopeConfigInterface::class);
+        $scope->method('getValue')->willReturn('stored');
+        $encryptor = $this->createMock(\Magento\Framework\Encryption\EncryptorInterface::class);
+
+        $encryptor->method('decrypt')->willReturnOnConsecutiveCalls('secret', '');
+        $config = new Config($scope, $encryptor);
+
+        $this->assertSame('secret', $config->getPassword(), 'encrypted value is decrypted');
+        $this->assertSame('stored', $config->getPassword(), 'pre-2.0 plain value still works');
+    }
 }

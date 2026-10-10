@@ -4,12 +4,25 @@
 
     <table name="quote">
         <column xsi:type="varchar" name="gls_method" length="64" nullable="true" comment="GLS Delivery Method"/>
-        <column xsi:type="varchar" name="gls_shop_id" length="64" nullable="true" comment="GLS Shop ID"/>
+        <column xsi:type="varchar" name="gls_shop_id" length="64" nullable="true" comment="GLS Parcel Shop ID"/>
+        <column xsi:type="varchar" name="gls_shop_name" length="255" nullable="true" comment="GLS Parcel Shop Name"/>
+        <column xsi:type="varchar" name="gls_shop_address" length="255" nullable="true" comment="GLS Parcel Shop Street"/>
+        <column xsi:type="varchar" name="gls_shop_postcode" length="16" nullable="true" comment="GLS Parcel Shop Postcode"/>
+        <column xsi:type="varchar" name="gls_shop_city" length="128" nullable="true" comment="GLS Parcel Shop City"/>
     </table>
 
     <table name="sales_order">
         <column xsi:type="varchar" name="gls_method" length="64" nullable="true" comment="GLS Delivery Method"/>
-        <column xsi:type="varchar" name="gls_shop_id" length="64" nullable="true" comment="GLS Shop ID"/>
+        <column xsi:type="varchar" name="gls_shop_id" length="64" nullable="true" comment="GLS Parcel Shop ID"/>
+        <column xsi:type="varchar" name="gls_shop_name" length="255" nullable="true" comment="GLS Parcel Shop Name"/>
+        <column xsi:type="varchar" name="gls_shop_address" length="255" nullable="true" comment="GLS Parcel Shop Street"/>
+        <column xsi:type="varchar" name="gls_shop_postcode" length="16" nullable="true" comment="GLS Parcel Shop Postcode"/>
+        <column xsi:type="varchar" name="gls_shop_city" length="128" nullable="true" comment="GLS Parcel Shop City"/>
+        <column xsi:type="varchar" name="gls_label_pdf" length="512" nullable="true" comment="GLS Label PDF (media path)"/>
+        <column xsi:type="int" name="gls_label_count" unsigned="true" nullable="false" default="0" comment="GLS Label Count"/>
+        <column xsi:type="boolean" name="gls_label_merged" nullable="false" default="0" comment="GLS Labels Merged Into One PDF"/>
+        <column xsi:type="varchar" name="gls_tracking_number" length="255" nullable="true" comment="GLS Consignment ID(s)"/>
+        <column xsi:type="varchar" name="gls_tracking_url" length="512" nullable="true" comment="GLS Tracking URL"/>
     </table>
 
 </schema>

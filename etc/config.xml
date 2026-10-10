@@ -1,16 +1,15 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:noNamespaceSchemaLocation="urn:magento:framework:Config/etc/config.xsd">
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
     <default>
-        <softcode>
+        <shipping>
             <gls>
                 <enabled>0</enabled>
-                <username/>
-                <password/>
-                <customer_id/>
-                <contact_id/>
+                <password backend_model="Magento\Config\Model\Config\Backend\Encrypted"/>
+                <max_parcel_weight>15</max_parcel_weight>
+                <ship_on_invoice>0</ship_on_invoice>
             </gls>
-        </softcode>
+        </shipping>
         <carriers>
             <softcode_gls>
                 <active>1</active>

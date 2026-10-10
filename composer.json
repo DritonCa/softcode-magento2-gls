@@ -1,16 +1,45 @@
 {
     "name": "softcode/module-gls",
-    "description": "GLS shipping carrier and parcel-shop selection for Magento 2.",
+    "description": "GLS Denmark for Magento 2: delivery methods, parcel-shop picker, label creation and tracking.",
     "type": "magento2-module",
     "license": "MIT",
+    "homepage": "https://softcode.dk/open-source",
+    "authors": [
+        {
+            "name": "SoftCode",
+            "homepage": "https://softcode.dk"
+        }
+    ],
+    "keywords": [
+        "magento2",
+        "gls",
+        "shipping",
+        "parcelshop",
+        "pakkeshop",
+        "denmark"
+    ],
+    "support": {
+        "issues": "https://github.com/DritonCa/softcode-magento2-gls/issues",
+        "source": "https://github.com/DritonCa/softcode-magento2-gls"
+    },
     "require": {
-        "php": "~8.1.0||~8.2.0",
-        "magento/framework": ">=103.0",
+        "php": "~8.1.0||~8.2.0||~8.3.0||~8.4.0",
+        "magento/framework": ">=103.0.6",
+        "magento/module-checkout": ">=100.4",
+        "magento/module-quote": ">=101.2",
+        "magento/module-sales": ">=103.0",
         "magento/module-shipping": ">=100.4",
-        "magento/module-quote": ">=101.2"
+        "magento/module-backend": ">=102.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.6"
     },
     "autoload": {
-        "files": ["registration.php"],
-        "psr-4": { "Softcode\\Gls\\": "" }
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Softcode\\Gls\\": ""
+        }
     }
 }

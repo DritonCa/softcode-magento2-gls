@@ -1,108 +1,162 @@
-# Softcode_Gls
+# Softcode_Gls – GLS Denmark for Magento 2
 
-A Magento 2 module that adds **GLS shipping** to the checkout: GLS Home, Business
-and ParcelShop delivery, a parcel-shop selector, and its own shipping-price rule.
-It attaches to any checkout — Luma, a custom one-page, or headless — through small
-JS hooks, and it persists the chosen GLS option all the way from quote to order.
+[![CI](https://github.com/DritonCa/softcode-magento2-gls/actions/workflows/ci.yml/badge.svg)](https://github.com/DritonCa/softcode-magento2-gls/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
----
+GLS delivery for the Magento 2 checkout: Home, Business and ParcelShop delivery with a
+parcel-shop picker, label creation from the admin order view, tracking links and
+automatic shipment when the order is invoiced.
+
+The module contains no shop-specific rules. What ships, and where the label is
+addressed, are extension points you configure or replace from your own module.
+
+## Features
+
+- **Delivery methods** – GLS Home, Business and ParcelShop, each with its own price.
+- **ParcelShop picker** – nearest shops from the GLS shop finder, saved on the quote
+  and copied to the order (id, name and address).
+- **Labels from the admin** – "Create GLS Label" on the order view calls the GLS
+  CreateShipment API, stores the PDF and starts the download.
+- **Heavy orders split into parcels** – one label per parcel under a configurable
+  weight limit, plus a combined PDF (or a ZIP) for printing.
+- **Tracking** – consignment ids become clickable links in Magento's shipment email
+  and the customer's order history.
+- **Ship when invoiced** – optional: invoicing an order with a label creates the
+  shipment and sends the shipment email. Works in either order (label first or
+  invoice first).
+- **Non-shippable items** – virtual/downloadable products and SKUs you list never
+  ship. A cart with nothing to ship gets a free "No delivery required" rate.
+- **Secure by default** – form-key (CSRF) validation, server-side method/price
+  validation, encrypted API password, ACL on label actions.
 
 ## Requirements
 
-- Magento **2.4.x**
-- PHP **8.1** or **8.2**
+| | Supported |
+|---|---|
+| Magento Open Source / Adobe Commerce | 2.4.6 – 2.4.8 |
+| PHP | 8.1 – 8.4 |
+| GLS | A GLS Denmark customer account (for labels) |
+
+Tested by installation, `setup:upgrade` and `setup:di:compile` on Magento 2.4.6-p3 with
+PHP 8.2; 2.4.7 and 2.4.8 are covered by the Composer constraints but not yet
+verified on a live shop.
 
 ## Installation
 
-**With Composer (recommended)**
-
 ```bash
-composer require softcode/module-gls
+composer config repositories.softcode-gls vcs https://github.com/DritonCa/softcode-magento2-gls
+composer require softcode/module-gls:^2.0
+bin/magento module:enable Softcode_Gls
 bin/magento setup:upgrade
 bin/magento setup:di:compile
 bin/magento cache:flush
 ```
 
-**Manually**
-
-Copy the module to `app/code/Softcode/Gls`, then run the same three commands.
-
 ## Configuration
 
-Enable the module and its carrier under
-**Stores → Configuration → Sales → Shipping Methods → Softcode GLS**.
-The carrier code is `softcode_gls`; access is guarded by the module's ACL.
+**Stores → Configuration → Sales → Shipping Methods → GLS**
 
----
+| Setting | Notes |
+|---|---|
+| Enable GLS | Master switch for the delivery methods |
+| Ship to Business / Home / Parcel Shop + price | Enable each method and set its price (0 = free) |
+| Non-shippable SKUs | Comma- or line-separated SKUs that never ship |
+| API User Name / Password / Customer ID / Contact ID | From GLS; needed for labels |
+| Label API URL | Leave empty for `https://api.gls.dk/ws/DK/V1/CreateShipment` |
+| Max Weight per Parcel (kg) | Default 15; 0 disables splitting |
+| Ship When Invoiced | Create the shipment + send the shipment email on invoice |
+| Tracking URL | `{number}` is replaced by the consignment id |
+
+Grant the ACL resource **Create and Download GLS Labels** (`Softcode_Gls::gls_label`)
+to the admin roles that print labels.
+
+### Checkout integration
+
+The checkout part renders into `window.softcode.delivery.mountPoint`
+(`#sc-delivery-methods` by default) and reads the address from these fields:
+
+| Field | Selector |
+|---|---|
+| Street / postcode | `#sc-address-street`, `#sc-address-postcode` |
+| Alternative delivery address | `#sc-use-alt-address`, `#sc-alt-street`, `#sc-alt-postcode` |
+
+It works out of the box with
+[Softcode_CheckoutOverride](https://github.com/DritonCa/softcode-magento2-checkout-override)
+and can be wired into any custom or headless checkout through the endpoints below.
+
+| Endpoint | Method | Purpose |
+|---|---|---|
+| `/gls/index/methods` | GET | Enabled methods + `needs_shipping` for the cart |
+| `/gls/index/getglslist` | GET | Parcel shops for `street` + `zipcode` |
+| `/gls/index/save` | POST | Save `method`, `shop_id` (+ shop details) on the quote; needs `form_key` |
+| `/gls/index/selected` | GET | The choice stored on the quote |
+
+JavaScript events: `softcode:gls:rendered` (after the methods are drawn, e.g. to
+reorder them) and `softcode:gls:saved`.
+
+## Extending
+
+**Exclude more items from shipping** – implement `Softcode\Gls\Api\ItemShippingRuleInterface`
+and add it to the rule list in your module's `di.xml`:
+
+```xml
+<type name="Softcode\Gls\Model\Shippability">
+    <arguments>
+        <argument name="rules" xsi:type="array">
+            <item name="courses" xsi:type="object">Vendor\Module\Model\CourseShippingRule</item>
+        </argument>
+    </arguments>
+</type>
+```
+
+**Address labels differently** – the default `RecipientResolver` uses the order's
+shipping address (company as the first line, "Att.: person" below). Replace it with a
+preference for `Softcode\Gls\Api\RecipientResolverInterface`.
+
+**Skip auto-shipment for one invoice** – set `gls_skip_auto_shipment` on the invoice
+before it is saved.
 
 ## How it works
 
-- **Carrier** (`Model/Carrier/Gls`) registers GLS as a shipping method so it shows
-  up in the quote's shipping rates.
-- **Price rule** (`Model/Quote/Address/Total/GlsShipping`) sets the GLS shipping
-  amount as a quote total, so the price is calculated server-side, not in the UI.
-- **Frontend** (`gls-checkout.js`) reads the customer's choice and talks to the
-  module's controllers to look up parcel shops and save the selection to the quote.
-
 ```mermaid
 flowchart LR
-    JS["Checkout<br/>(gls-checkout.js)"] -->|AJAX| C["GLS controllers"]
-    C --> Q["Quote<br/>(GLS method + shop)"]
-    Q --> T["GlsShipping total<br/>(server-side price)"]
-    T --> O["Order"]
+    C["Checkout JS"] -->|save method / shop| Q["Quote<br/>gls_* fields"]
+    Q -->|fieldset.xml| O["Order"]
+    O -->|Create GLS Label| L["LabelService<br/>split · request · store PDF"]
+    L -->|CreateShipment| G["GLS API"]
+    I["Invoice saved"] -->|observer| S["AutoShipment<br/>shipment + tracking + email"]
+    L -->|already invoiced| S
 ```
-
-### Endpoints
-
-| Method | Route | Purpose |
-| --- | --- | --- |
-| `GET`  | `/gls/index/methods` | Available GLS delivery methods |
-| `GET`  | `/gls/index/getglslist` | Nearby parcel shops for a postcode |
-| `GET`  | `/gls/index/selected` | The currently selected GLS option |
-| `POST` | `/gls/index/save` | Save the chosen method / parcel shop to the quote |
-
-Each controller declares its HTTP verb via `HttpGetActionInterface` /
-`HttpPostActionInterface`, per Magento conventions.
-
----
-
-## Notes for integrators
-
-- The parcel-shop list is looked up live; point it at your GLS data source in
-  `Controller/Index/getGlsList`.
-- As with any custom AJAX checkout, send Magento's `form_key` with the `save` POST
-  and validate it (`CsrfAwareActionInterface` + `FormKey\Validator`) before going
-  to production.
-
----
 
 ## Testing
 
-`Model\Config` is the single source of truth for which GLS methods are offered and
-at what price, so it has a unit test that doubles as an executable specification.
-It is pure logic and **runs without a Magento install** — `Test/bootstrap.php`
-autoloads the module and stubs the couple of Magento contracts it mocks:
+The unit tests run without a Magento install (`Test/bootstrap.php` stubs the few
+contracts they need):
 
 ```bash
 phpunit -c phpunit.xml.dist
 ```
 
-`ConfigTest` covers the carrier being disabled, only enabled methods being offered,
-stable method ordering, and — importantly — that `getMethodPrice()` returns `0.0`
-for a free method but `null` for a method that is not allowed. `GlsShipping` relies
-on exactly that distinction, so the test guards against a forged method silently
-falling through to zero shipping.
+They cover the delivery-method rules and prices, shipping rules (product types,
+excluded SKUs, child items, project rules), parcel splitting, phone formatting, the
+GLS request XML (escaping, country codes, parcel shop) and response parsing. CI runs
+them on PHP 8.1–8.4 together with the Magento 2 coding standard.
 
-## What CI checks
+Label creation against the live GLS API needs GLS credentials and is verified
+manually.
 
-The GitHub Actions workflow runs on every push/PR and **fails the build** on:
+## Upgrading from 1.x
 
-- PHP syntax errors (`php -l` on every file)
-- Magento 2 coding-standard **errors** (`phpcs --standard=Magento2 -n`)
-- **Unit-test failures** (`phpunit -c phpunit.xml.dist`, run as a real gate)
+- New order columns for shop details, labels and tracking are added by `setup:upgrade`.
+- The API password is now stored encrypted. Existing plain-text passwords keep
+  working; re-save the field once to encrypt it.
+- The GLS choice is now copied from quote to order by the module itself (`fieldset.xml`).
 
----
+## Need help?
+
+Installation, adaptation to your checkout or GLS setup:
+[SoftCode](https://softcode.dk) – Magento 2 development in Copenhagen.
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT – see [LICENSE](LICENSE).
