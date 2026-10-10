@@ -44,7 +44,7 @@ verified on a live shop.
 ## Installation
 
 ```bash
-composer config repositories.softcode-gls vcs https://github.com/DritonCa/softcode-magento2-gls
+composer config repositories.softcode-magento2-gls vcs https://github.com/DritonCa/softcode-magento2-gls
 composer require softcode/module-gls:^2.0
 bin/magento module:enable Softcode_Gls
 bin/magento setup:upgrade
