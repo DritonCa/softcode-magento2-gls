@@ -1,6 +1,7 @@
 # Softcode_Gls – GLS Denmark for Magento 2
 
 [![CI](https://github.com/DritonCa/softcode-magento2-gls/actions/workflows/ci.yml/badge.svg)](https://github.com/DritonCa/softcode-magento2-gls/actions/workflows/ci.yml)
+[![Packagist](https://img.shields.io/packagist/v/softcode/module-gls.svg)](https://packagist.org/packages/softcode/module-gls)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 GLS delivery for the Magento 2 checkout: Home, Business and ParcelShop delivery with a
@@ -44,7 +45,6 @@ verified on a live shop.
 ## Installation
 
 ```bash
-composer config repositories.softcode-magento2-gls vcs https://github.com/DritonCa/softcode-magento2-gls
 composer require softcode/module-gls:^2.0
 bin/magento module:enable Softcode_Gls
 bin/magento setup:upgrade
